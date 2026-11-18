@@ -1,0 +1,11 @@
+version	timestamp	operation
+0	2026-11-11 12:10:21.507000	WRITE
+1	2026-11-11 12:10:36.698000	MERGE
+
+PERBANDINGAN LAPORAN RPT-0008
+versi 0 : revisi=1 jalan=lancar jiwa=1279 event_time=2026-11-11 02:58:00
+versi kini: revisi=2 jalan=putus jiwa=2046 event_time=2026-11-11 02:58:00
+SQL VERSION AS OF 0 -> revisi=1 jalan=lancar jiwa=1279
+
+Catatan: event_time tidak berubah (kejadian memang lebih tua), yang berubah adalah
+received_at dan isi laporan. Laporan lama tidak dihapus, tetap bisa dibaca lewat versi.

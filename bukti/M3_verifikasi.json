@@ -1,0 +1,14 @@
+{
+  "lulus": true,
+  "jumlah_baris": {
+    "bronze.gempa_usgs": 55194,
+    "bronze.gempa_bmkg": 31,
+    "bronze.laporan_edge": 166,
+    "silver.gempa_tervalidasi": 55219,
+    "silver.laporan_edge_aktif": 136,
+    "silver.quarantine": 29,
+    "gold.prioritas_area": 22,
+    "gold.status_akses_fasilitas": 77,
+    "gold.rekap_bantuan": 72
+  }
+}

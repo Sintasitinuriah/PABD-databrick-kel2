@@ -1,0 +1,69 @@
+WARNING: Using incubator modules: jdk.incubator.vector
+:: loading settings :: file = /workspace/lokal/ivysettings.xml
+:: loading settings :: url = jar:file:/opt/spark/jars/ivy-2.5.3.jar!/org/apache/ivy/core/settings/ivysettings.xml
+Ivy Default Cache set to: /tmp/ivy/cache
+The jars for the packages stored in: /tmp/ivy/jars
+io.delta#delta-spark_2.13 added as a dependency
+:: resolving dependencies :: org.apache.spark#spark-submit-parent-fd170638-0ed0-4e3b-a88a-79e3d566e6e7;1.0
+	confs: [default]
+	found io.delta#delta-spark_2.13;4.4.0 in aliyun
+	found io.delta#delta-storage;4.4.0 in aliyun
+	found io.unitycatalog#unitycatalog-client;0.6.0 in aliyun
+	found org.slf4j#slf4j-api;2.0.13 in aliyun
+	found org.apache.logging.log4j#log4j-slf4j2-impl;2.25.3 in aliyun
+	found org.apache.logging.log4j#log4j-api;2.25.3 in aliyun
+	found com.google.code.findbugs#jsr305;3.0.2 in aliyun
+	found io.unitycatalog#unitycatalog-hadoop;0.6.0 in aliyun
+	found org.apache.logging.log4j#log4j-core;2.25.3 in aliyun
+	found io.delta#delta-kernel-api;4.4.0 in aliyun
+	found org.roaringbitmap#RoaringBitmap;0.9.25 in aliyun
+	found com.fasterxml.jackson.core#jackson-databind;2.13.5 in aliyun
+	found com.fasterxml.jackson.core#jackson-annotations;2.13.5 in aliyun
+	found com.fasterxml.jackson.core#jackson-core;2.13.5 in aliyun
+	found com.fasterxml.jackson.datatype#jackson-datatype-jdk8;2.13.5 in aliyun
+	found org.roaringbitmap#shims;0.9.25 in aliyun
+	found io.delta#delta-kernel-defaults;4.4.0 in aliyun
+	found org.apache.hadoop#hadoop-client-runtime;3.4.2 in aliyun
+	found org.apache.parquet#parquet-hadoop;1.16.0 in aliyun
+	found org.apache.parquet#parquet-column;1.16.0 in aliyun
+	found org.apache.parquet#parquet-common;1.16.0 in aliyun
+	found org.apache.parquet#parquet-format-structures;1.16.0 in aliyun
+	found javax.annotation#javax.annotation-api;1.3.2 in aliyun
+	found org.apache.parquet#parquet-encoding;1.16.0 in aliyun
+	found org.locationtech.jts#jts-core;1.20.0 in aliyun
+	found org.xerial.snappy#snappy-java;1.1.10.7 in aliyun
+	found io.airlift#aircompressor;2.0.2 in aliyun
+	found commons-pool#commons-pool;1.6 in aliyun
+	found com.github.luben#zstd-jni;1.5.7-3 in aliyun
+	found org.apache.hadoop#hadoop-client-api;3.4.2 in aliyun
+	found commons-logging#commons-logging;1.3.0 in aliyun
+	found org.apache.parquet#parquet-jackson;1.16.0 in aliyun
+	found io.delta#delta-kernel-unitycatalog;4.4.0 in aliyun
+:: resolution report :: resolve 1415ms :: artifacts dl 45ms
+	:: evicted modules:
+	org.slf4j#slf4j-api;2.0.17 by [org.slf4j#slf4j-api;2.0.13] in [default]
+	org.slf4j#slf4j-api;1.7.36 by [org.slf4j#slf4j-api;2.0.13] in [default]
+	org.slf4j#slf4j-api;1.7.33 by [org.slf4j#slf4j-api;2.0.13] in [default]
+	org.xerial.snappy#snappy-java;1.1.10.4 by [org.xerial.snappy#snappy-java;1.1.10.7] in [default]
+	---------------------------------------------------------------------
+	|                  |            modules            ||   artifacts   |
+	|       conf       | number| search|dwnlded|evicted|| number|dwnlded|
+	---------------------------------------------------------------------
+	|      default     |   37  |   0   |   0   |   4   ||   33  |   0   |
+	---------------------------------------------------------------------
+:: retrieving :: org.apache.spark#spark-submit-parent-fd170638-0ed0-4e3b-a88a-79e3d566e6e7
+	confs: [default]
+	0 artifacts copied, 33 already retrieved (0kB/28ms)
+26/11/11 12:39:36 WARN NativeCodeLoader: Unable to load native-hadoop library for your platform... using builtin-java classes where applicable
+Using Spark's default log4j profile: org/apache/spark/log4j2-defaults.properties
+Setting default log level to "WARN".
+To adjust logging level use sc.setLogLevel(newLevel). For SparkR, use setLogLevel(newLevel).
+
+=== E4: masalah file kecil dan OPTIMIZE ===
+  12 tulis kecil -> 12 file Parquet dirujuk versi terkini
+  setelah OPTIMIZE -> 1 file Parquet dirujuk versi terkini
+  file fisik di disk: 24 -> 25 (file lama baru dihapus oleh VACUUM)
+  bukti -> bukti/M4_E4_optimize.txt
+
+=== RINGKASAN EKSPERIMEN ===
+  E4: LULUS

@@ -1,0 +1,24 @@
+12 operasi tulis kecil menghasilkan 12 file Parquet (versi 0..11)
+OPTIMIZE memadatkannya menjadi 1 file Parquet pada versi terkini
+Jumlah baris tetap 12 (tidak ada data hilang)
+
+File fisik di disk: 24 sebelum -> 25 sesudah.
+Selisih 12 berkas sebelum OPTIMIZE adalah file kosong (376 byte)
+sisa task Spark tanpa baris: tidak dirujuk log, ikut dibersihkan VACUUM.
+File lama tidak langsung dihapus: OPTIMIZE hanya menulis aksi remove di _delta_log,
+berkasnya baru dibuang oleh VACUUM. Karena itu versi lama masih bisa dibaca (E2/E5).
+
+Riwayat versi:
+  versi 0: WRITE
+  versi 1: WRITE
+  versi 2: WRITE
+  versi 3: WRITE
+  versi 4: WRITE
+  versi 5: WRITE
+  versi 6: WRITE
+  versi 7: WRITE
+  versi 8: WRITE
+  versi 9: WRITE
+  versi 10: WRITE
+  versi 11: WRITE
+  versi 12: OPTIMIZE

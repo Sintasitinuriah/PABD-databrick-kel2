@@ -1,0 +1,25 @@
+services:
+  delta-lab:
+    image: deltaio/delta-docker:4.4.0
+    container_name: delta-lake-lab
+    # Entrypoint ditimpa agar container tetap hidup; semua pipeline dijalankan via docker exec
+    # supaya langkah praktikum bisa diulang dan direkam satu per satu.
+    entrypoint: ["/bin/bash", "-lc"]
+    command: ["sleep infinity"]
+    user: root
+    working_dir: /workspace
+    ports:
+      - "8888:8888"
+      - "4040:4040"
+    volumes:
+      - ../:/workspace
+      - delta_data:/delta
+    environment:
+      PYTHONUNBUFFERED: "1"
+      PYSPARK_PYTHON: /usr/bin/python3.10
+      PYSPARK_DRIVER_PYTHON: /usr/bin/python3.10
+    mem_limit: 4g
+    shm_size: 1g
+
+volumes:
+  delta_data:

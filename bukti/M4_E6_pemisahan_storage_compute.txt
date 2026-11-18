@@ -1,0 +1,8 @@
+berkas sebelum: 6 | sesudah: 6
+hash seluruh berkas: IDENTIK
+baris terbaca setelah container dimatikan lalu dinyalakan: 22
+prioritas teratas: Manggarai (skor 162.58)
+
+Compute (Spark) mati total, data di volume tetap utuh byte-per-byte.
+Inilah pemisahan storage-compute yang dipakai Databricks: cluster bisa dimatikan
+saat idle tanpa kehilangan data, dan dinyalakan lagi saat ada pekerjaan.

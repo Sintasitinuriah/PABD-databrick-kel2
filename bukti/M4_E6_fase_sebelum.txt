@@ -1,0 +1,4 @@
+tabel: /delta/gold/prioritas_area
+berkas: 6
+baris: 22
+hash disimpan di bukti/M4_E6_hash_sebelum.json

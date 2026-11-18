@@ -202,4 +202,71 @@ Diagram dirender lewat matplotlib dengan label Indonesia yang deterministik (buk
 
 ## 9. Catatan progres
 
-_(diisi setiap milestone selesai, beserta keluaran gerbang verifikasinya)_
+### M0 — selesai 2026-11-11 18:08
+Commit baseline `1b911b4`. Struktur folder dibuat, `.gitignore` mengecualikan `data/`.
+
+### M2 — selesai 2026-11-11 18:10, gerbang LULUS
+`python scripts\siapkan_data.py --verify` → **34 berkas, 0 bermasalah, semua hash cocok.**
+- USGS: **55.194 event** asli (Indonesia, 2000–2026, M2.5+), 27 potongan tahunan, gabung jadi `usgs_indonesia.csv` (9,87 MB).
+  Catatan: angka `count` API menyebut 55.312; hasil unduhan CSV 55.194. Selisih 118 event kemungkinan karena batas waktu/`updated` antara dua panggilan — yang dipakai di seluruh praktikum adalah **55.194** (angka dari berkas yang di-hash).
+- BMKG: `autogempa`, `gempaterkini` (15 event), `gempadirasakan` — payload mentah disimpan utuh.
+- Wilayah NTT: 22 kabupaten/kota, **nama faktual**, koordinat perkiraan, **populasi & indeks risiko sintetis berlabel**.
+- Laporan edge: 166 baris = 140 dasar + 8 revisi terlambat + 5 konflik + 6 koordinat invalid + 4 tanpa identitas + 3 duplikat.
+- Seed sintetis: `20261112`.
+
+### Kendala jaringan dan jalan keluar (2026-11-11 18:12–18:43)
+Ini penting dicatat karena mempengaruhi cara praktikum direproduksi:
+
+| Gejala | Penyebab | Jalan keluar |
+|---|---|---|
+| `docker pull` tampak macet, log kosong | log di-pipe ke `tail` sehingga ter-buffer | tulis log langsung ke berkas, jangan di-pipe |
+| diagnosis awal "Docker Hub diblokir" | **keliru** — `curl` ke `auth.docker.io` gagal, tetapi Docker daemon tetap berhasil menarik image | image `deltaio/delta-docker:4.4.0` (6,33 GB) berhasil masuk; pull yang dihentikan CLI-nya tetap diselesaikan daemon |
+| pull quay.io gagal | `cdn01.quay.io` tidak bisa di-resolve | jalur quay.io dibatalkan, `Dockerfile` turunannya dihapus |
+| Delta jar tidak ada di image | image mengunduh jar dari Maven saat start | perlu resolusi jar terpisah |
+| `repo1.maven.org`, mirror Google, `plugins.gradle.org` semua gagal DNS | pembatasan jaringan | **mirror `maven.aliyun.com` terbukti melayani jar Delta (HTTP 200)** → `lokal/ivysettings.xml` mengarahkan Ivy hanya ke sana |
+| `python` tidak ada di PATH container | image hanya punya `/usr/bin/python3.10` | semua perintah memakai path penuh; `PYSPARK_PYTHON` disetel di compose |
+
+### M1 — lingkungan hidup 2026-11-11 18:35
+Container `delta-lake-lab` Up, port 4040 (Spark UI) & 8888. **Spark 4.2.0, Delta 4.4.0, Java 21.**
+Volume `lokal_delta_data` terpasang di `/delta` dan bisa ditulis; proyek ter-bind di `/workspace`.
+Container tesis `typed-evidence-postgres` tetap berjalan, tidak disentuh.
+
+### M3 — pipeline medallion LULUS 2026-11-11 19:18
+Gerbang `M3_verifikasi.json`: **LULUS** (9 tabel, koordinat dalam bbox, tanpa duplikat event_id,
+8 revisi direkonsiliasi, prioritas teratas Manggarai 162.58).
+- Bronze: sumber_mentah 3, gempa_bmkg 31, gempa_usgs 55.194, ref_wilayah 22, laporan_edge 166.
+- Silver: gempa_tervalidasi 55.219; laporan_edge_aktif 135 → 136 setelah MERGE (8 baris revisi > 1);
+  quarantine 29 (konflik 10, koordinat luar NTT 6, identitas kosong 4, duplikat event 4, duplikat persis 3, koordinat luar cakupan 2).
+- Gold: jendela 30 hari berisi 23 gempa NTT; prioritas_area 22, status_akses_fasilitas 77, rekap_bantuan 72.
+- **Bug ditemukan & diperbaiki:** `countDistinct` di dalam window ditolak Spark
+  (`DISTINCT_WINDOW_FUNCTION_UNSUPPORTED`); kegagalan sempat tertelan pesan "[LEWATI] Bronze tidak ada".
+  Diganti groupBy+agg+join, dan pesan kegagalan dibuat jujur (`[GAGAL] ...`).
+
+### M4 — enam eksperimen LULUS 2026-11-11 19:57
+- E1: 2 Parquet (40.845 byte) + 2 commit JSON (6.483 byte); aksi versi 0 = commitInfo/metaData/protocol/add.
+- E2: RPT-0008 versi 0 (revisi 1, lancar, 1.279) vs kini (revisi 2, putus, 2.046); event_time tetap 02:58.
+- E3: append bertipe salah DITOLAK (`DELTA_FAILED_TO_MERGE_FIELDS`), baris tetap 136.
+- E4: 12 file → 1 file setelah OPTIMIZE, baris tetap 12. **Koreksi pengukuran:** menghitung file fisik
+  di disk menyesatkan (24 → 25) karena file lama baru hilang setelah VACUUM; kini memakai
+  `DeltaTable.detail().numFiles`. Ditemukan pula 12 file kosong 376 byte sisa task Spark tanpa baris.
+- E5: VACUUM RETAIN 0 HOURS menghapus 8 dari 9 file fisik; versi 0 gagal dibaca
+  (`FAILED_READ_FILE.FILE_NOT_EXIST`). **Koreksi:** pengecekan memakai `collect()`, bukan `count()`,
+  karena COUNT bisa terjawab dari metadata tanpa menyentuh berkas.
+- E6: container dimatikan lalu dinyalakan; hash 6 berkas **IDENTIK**, 22 baris terbaca,
+  prioritas teratas Manggarai 162.58.
+
+### M6 — PPT 18 slide + narasi + cheatsheet SELESAI 2026-11-11 20:10
+- `presentasi/Databricks_Kelompok2_Gempa_NTT.pptx`: 18 slide, tersimpan & dibuka ulang oleh engine
+  (rev 30). Semua slide punya speaker notes berisi pembicara dan durasi; total narasi 900 detik.
+- Pembagian: Alif 1–4 (3:00), Beatrix 5–8 (3:40), Kevin 9–12 (3:30), Sinta 13–15 (2:40), Raoul 16–18 (2:10).
+- Tabel Gold slide 12 adalah tabel native PowerPoint (bukan gambar), bisa diedit langsung.
+- **Tinjauan visual dilakukan** lewat ekspor PNG PowerPoint (`scripts/export_preview.ps1`,
+  hasil di `presentasi/preview_png/`). Dua cacat nyata ditemukan lalu diperbaiki dan diverifikasi
+  ulang pada ekspor kedua: (1) baris isi tabel Gold berlatar gelap sehingga teks gelap tidak terbaca
+  → shading sel isi diputihkan; (2) baris `_checksum` di slide 10 terpotong tepi kotak kode
+  → line spacing paragraf kode dirapatkan ke 140%.
+- `presentasi/NARASI_PRESENTASI.md`: naskah ucap 18 slide + antisipasi 5 pertanyaan penguji.
+- `presentasi/DEMO_CHEATSHEET.md`: 4 demo live beserta perintah PowerShell/docker, keluaran yang
+  diharapkan, dan fallback ke berkas bukti. Demo 1 & 2 sudah diuji hidup terhadap container.
+- M5 (screenshot UI Databricks Free Edition) masih MENUNGGU pendaftaran akun oleh Sinta;
+  slide 16 menyatakan status ini secara jujur dan memakai diagram 05 sebagai pengganti sementara.

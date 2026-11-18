@@ -1,0 +1,113 @@
+WARNING: Using incubator modules: jdk.incubator.vector
+:: loading settings :: file = /workspace/lokal/ivysettings.xml
+:: loading settings :: url = jar:file:/opt/spark/jars/ivy-2.5.3.jar!/org/apache/ivy/core/settings/ivysettings.xml
+Ivy Default Cache set to: /tmp/ivy/cache
+The jars for the packages stored in: /tmp/ivy/jars
+io.delta#delta-spark_2.13 added as a dependency
+:: resolving dependencies :: org.apache.spark#spark-submit-parent-17032b97-b9cf-4554-9435-c40b55edbfad;1.0
+	confs: [default]
+	found io.delta#delta-spark_2.13;4.4.0 in aliyun
+	found io.delta#delta-storage;4.4.0 in aliyun
+	found io.unitycatalog#unitycatalog-client;0.6.0 in aliyun
+	found org.slf4j#slf4j-api;2.0.13 in aliyun
+	found org.apache.logging.log4j#log4j-slf4j2-impl;2.25.3 in aliyun
+	found org.apache.logging.log4j#log4j-api;2.25.3 in aliyun
+	found com.google.code.findbugs#jsr305;3.0.2 in aliyun
+	found io.unitycatalog#unitycatalog-hadoop;0.6.0 in aliyun
+	found org.apache.logging.log4j#log4j-core;2.25.3 in aliyun
+	found io.delta#delta-kernel-api;4.4.0 in aliyun
+	found org.roaringbitmap#RoaringBitmap;0.9.25 in aliyun
+	found com.fasterxml.jackson.core#jackson-databind;2.13.5 in aliyun
+	found com.fasterxml.jackson.core#jackson-annotations;2.13.5 in aliyun
+	found com.fasterxml.jackson.core#jackson-core;2.13.5 in aliyun
+	found com.fasterxml.jackson.datatype#jackson-datatype-jdk8;2.13.5 in aliyun
+	found org.roaringbitmap#shims;0.9.25 in aliyun
+	found io.delta#delta-kernel-defaults;4.4.0 in aliyun
+	found org.apache.hadoop#hadoop-client-runtime;3.4.2 in aliyun
+	found org.apache.parquet#parquet-hadoop;1.16.0 in aliyun
+	found org.apache.parquet#parquet-column;1.16.0 in aliyun
+	found org.apache.parquet#parquet-common;1.16.0 in aliyun
+	found org.apache.parquet#parquet-format-structures;1.16.0 in aliyun
+	found javax.annotation#javax.annotation-api;1.3.2 in aliyun
+	found org.apache.parquet#parquet-encoding;1.16.0 in aliyun
+	found org.locationtech.jts#jts-core;1.20.0 in aliyun
+	found org.xerial.snappy#snappy-java;1.1.10.7 in aliyun
+	found io.airlift#aircompressor;2.0.2 in aliyun
+	found commons-pool#commons-pool;1.6 in aliyun
+	found com.github.luben#zstd-jni;1.5.7-3 in aliyun
+	found org.apache.hadoop#hadoop-client-api;3.4.2 in aliyun
+	found commons-logging#commons-logging;1.3.0 in aliyun
+	found org.apache.parquet#parquet-jackson;1.16.0 in aliyun
+	found io.delta#delta-kernel-unitycatalog;4.4.0 in aliyun
+:: resolution report :: resolve 1966ms :: artifacts dl 124ms
+	:: evicted modules:
+	org.slf4j#slf4j-api;2.0.17 by [org.slf4j#slf4j-api;2.0.13] in [default]
+	org.slf4j#slf4j-api;1.7.36 by [org.slf4j#slf4j-api;2.0.13] in [default]
+	org.slf4j#slf4j-api;1.7.33 by [org.slf4j#slf4j-api;2.0.13] in [default]
+	org.xerial.snappy#snappy-java;1.1.10.4 by [org.xerial.snappy#snappy-java;1.1.10.7] in [default]
+	---------------------------------------------------------------------
+	|                  |            modules            ||   artifacts   |
+	|       conf       | number| search|dwnlded|evicted|| number|dwnlded|
+	---------------------------------------------------------------------
+	|      default     |   37  |   0   |   0   |   4   ||   33  |   0   |
+	---------------------------------------------------------------------
+:: retrieving :: org.apache.spark#spark-submit-parent-17032b97-b9cf-4554-9435-c40b55edbfad
+	confs: [default]
+	0 artifacts copied, 33 already retrieved (0kB/44ms)
+26/11/11 12:53:21 WARN NativeCodeLoader: Unable to load native-hadoop library for your platform... using builtin-java classes where applicable
+Using Spark's default log4j profile: org/apache/spark/log4j2-defaults.properties
+Setting default log level to "WARN".
+To adjust logging level use sc.setLogLevel(newLevel). For SparkR, use setLogLevel(newLevel).
+
+=== E5: VACUUM membatasi time travel (konsekuensi untuk audit trail) ===
+  sebelum VACUUM: baca versi 0 berhasil (1 baris), 9 file fisik di disk
+Deleted 8 files and directories in a total of 1 directories.
+26/11/11 12:55:45 ERROR Executor: Exception in task 0.0 in stage 113.0 (TID 10561)
+org.apache.spark.SparkException: [FAILED_READ_FILE.FILE_NOT_EXIST] Encountered error while reading file file:/delta/gold/uji_retensi_audit/part-00001-6f11a044-e8b6-445f-a685-b0edc91a0d32-c000.snappy.parquet. File does not exist. It is possible the underlying files have been updated.
+You can explicitly invalidate the cache in Spark by running 'REFRESH TABLE tableName' command in SQL or by recreating the Dataset/DataFrame involved. SQLSTATE: KD001
+	at org.apache.spark.sql.errors.QueryExecutionErrors$.fileNotExistError(QueryExecutionErrors.scala:902)
+	at org.apache.spark.sql.execution.datasources.v2.FileDataSourceV2$.attachFilePath(FileDataSourceV2.scala:140)
+	at org.apache.spark.sql.execution.datasources.FileScanRDD$$anon$1.hasNext(FileScanRDD.scala:149)
+	at org.apache.spark.sql.execution.FileSourceScanExec$$anon$1.hasNext(DataSourceScanExec.scala:777)
+	at org.apache.spark.sql.catalyst.expressions.GeneratedClass$GeneratedIteratorForCodegenStage1.columnartorow_nextBatch_0$(Unknown Source)
+	at org.apache.spark.sql.catalyst.expressions.GeneratedClass$GeneratedIteratorForCodegenStage1.processNext(Unknown Source)
+	at org.apache.spark.sql.execution.BufferedRowIterator.hasNext(BufferedRowIterator.java:44)
+	at org.apache.spark.sql.execution.WholeStageCodegenEvaluatorFactory$WholeStageCodegenPartitionEvaluator$$anon$1.hasNext(WholeStageCodegenEvaluatorFactory.scala:50)
+	at org.apache.spark.sql.execution.SparkPlan.$anonfun$getByteArrayRdd$2(SparkPlan.scala:418)
+	at org.apache.spark.rdd.RDD.$anonfun$mapPartitionsInternal$2(RDD.scala:910)
+	at org.apache.spark.rdd.RDD.$anonfun$mapPartitionsInternal$2$adapted(RDD.scala:910)
+	at org.apache.spark.rdd.MapPartitionsRDD.compute(MapPartitionsRDD.scala:57)
+	at org.apache.spark.rdd.RDD.computeOrReadCheckpoint(RDD.scala:374)
+	at org.apache.spark.rdd.RDD.iterator(RDD.scala:338)
+	at org.apache.spark.scheduler.ResultTask.runTask(ResultTask.scala:93)
+	at org.apache.spark.TaskContext.runTaskWithListeners(TaskContext.scala:206)
+	at org.apache.spark.scheduler.Task.run(Task.scala:147)
+	at org.apache.spark.executor.Executor$TaskRunner.$anonfun$run$4(Executor.scala:894)
+	at org.apache.spark.util.SparkErrorUtils.tryWithSafeFinally(SparkErrorUtils.scala:86)
+	at org.apache.spark.util.SparkErrorUtils.tryWithSafeFinally$(SparkErrorUtils.scala:83)
+	at org.apache.spark.util.Utils$.tryWithSafeFinally(Utils.scala:97)
+	at org.apache.spark.executor.Executor$TaskRunner.run(Executor.scala:897)
+	at java.base/java.util.concurrent.ThreadPoolExecutor.runWorker(ThreadPoolExecutor.java:1144)
+	at java.base/java.util.concurrent.ThreadPoolExecutor$Worker.run(ThreadPoolExecutor.java:642)
+	at java.base/java.lang.Thread.run(Thread.java:1583)
+Caused by: java.io.FileNotFoundException: File file:/delta/gold/uji_retensi_audit/part-00001-6f11a044-e8b6-445f-a685-b0edc91a0d32-c000.snappy.parquet does not exist
+	at org.apache.hadoop.fs.RawLocalFileSystem.deprecatedGetFileStatus(RawLocalFileSystem.java:980)
+	at org.apache.hadoop.fs.RawLocalFileSystem.getFileLinkStatusInternal(RawLocalFileSystem.java:1301)
+	at org.apache.hadoop.fs.RawLocalFileSystem.getFileStatus(RawLocalFileSystem.java:970)
+	at org.apache.hadoop.fs.FilterFileSystem.getFileStatus(FilterFileSystem.java:462)
+	at org.apache.parquet.hadoop.util.HadoopInputFile.fromPath(HadoopInputFile.java:61)
+	at org.apache.spark.sql.execution.datasources.parquet.ParquetFooterReader.openFileAndReadFooter(ParquetFooterReader.java:100)
+	at org.apache.spark.sql.execution.datasources.parquet.ParquetFileFormat.$anonfun$buildReaderWithPartitionValues$2(ParquetFileFormat.scala:229)
+	at org.apache.spark.sql.execution.datasources.FileScanRDD$$anon$1.org$apache$spark$sql$execution$datasources$FileScanRDD$$anon$$readCurrentFile(FileScanRDD.scala:238)
+	at org.apache.spark.sql.execution.datasources.FileScanRDD$$anon$1.nextIterator(FileScanRDD.scala:298)
+	at org.apache.spark.sql.execution.datasources.FileScanRDD$$anon$1.hasNext0(FileScanRDD.scala:138)
+	at org.apache.spark.sql.execution.datasources.FileScanRDD$$anon$1.hasNext(FileScanRDD.scala:147)
+	... 22 more
+26/11/11 12:55:46 ERROR TaskSetManager: Task 0 in stage 113.0 failed 1 times; aborting job
+  setelah VACUUM: baca versi 0 GAGAL -> file lama sudah dihapus fisik
+  Py4JJavaError: : org.apache.spark.SparkException: [FAILED_READ_FILE.FILE_NOT_EXIST] Encountered error while reading file file:/delta/gold/uji_retensi_audit/part-00001-6f11a044-e8b6-445f-a685-b0edc91a0
+  file fisik: 9 -> 1; data versi terkini tetap 4 baris
+  bukti -> bukti/M4_E5_vacuum_vs_audit.txt
+
+=== RINGKASAN EKSPERIMEN ===
+  E5: LULUS

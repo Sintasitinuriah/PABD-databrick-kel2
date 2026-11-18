@@ -1,0 +1,14 @@
+Tabel uji: /delta/gold/uji_retensi_audit (4 tulis kecil lalu OPTIMIZE agar file versi 0 tidak lagi dirujuk)
+Sebelum VACUUM: versi 0 terbaca, 1 baris; 9 file fisik di disk
+VACUUM RETAIN 0 HOURS dijalankan (retention check dimatikan khusus demo)
+Sesudah VACUUM: versi 0 TIDAK bisa dibaca; 1 file fisik di disk
+Data versi terbaru tetap utuh: 4 baris
+
+Py4JJavaError: : org.apache.spark.SparkException: [FAILED_READ_FILE.FILE_NOT_EXIST] Encountered error while reading file file:/delta/gold/uji_retensi_audit/part-00001-6f11a044-e8b6-445f-a685-b0edc91a0d32-c000.snappy.parquet. File does not exist. It is possible the underlying files have been updated.
+
+Pengecekan memakai pembacaan baris (collect), bukan COUNT: COUNT saja bisa
+terjawab dari metadata tanpa menyentuh berkas yang sudah dihapus.
+
+IMPLIKASI UNTUK BPBD/BNPB: klaim 'bukti historis abadi' hanya berlaku selama
+berkas belum di-VACUUM. Retensi audit harus disetel lebih panjang dari kebutuhan
+penelusuran, atau arsipkan versi ke penyimpanan terpisah.

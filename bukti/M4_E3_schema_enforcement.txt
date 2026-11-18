@@ -1,0 +1,6 @@
+PERCOBAAN: append kolom jiwa_terdampak bertipe STRING ke tabel yang kolomnya BIGINT
+HASIL: DITOLAK
+
+AnalysisException: [DELTA_FAILED_TO_MERGE_FIELDS] Failed to merge fields 'jiwa_terdampak' and 'jiwa_terdampak'
+
+Jumlah baris tabel setelah percobaan: 136 (tidak bertambah)
