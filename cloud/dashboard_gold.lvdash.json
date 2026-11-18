@@ -1,0 +1,763 @@
+{
+  "datasets": [
+    {
+      "name": "ds_prio",
+      "displayName": "Prioritas area",
+      "queryLines": [
+        "SELECT wilayah_id, nama_wilayah, populasi, indeks_risiko, jumlah_gempa, mag_maks, jumlah_laporan, jiwa_terdampak, jalan_putus, jalan_terbatas, skor_prioritas FROM workspace.kelompok2.gold_prioritas_area ORDER BY skor_prioritas DESC"
+      ]
+    },
+    {
+      "name": "ds_akses",
+      "displayName": "Status akses fasilitas",
+      "queryLines": [
+        "SELECT a.jenis_fasilitas, a.jumlah_fasilitas, a.akses_putus, a.akses_terbatas, a.akses_lancar, p.nama_wilayah FROM workspace.kelompok2.gold_status_akses_fasilitas a JOIN workspace.kelompok2.gold_prioritas_area p USING (wilayah_id)"
+      ]
+    },
+    {
+      "name": "ds_bantuan",
+      "displayName": "Rekap kebutuhan bantuan",
+      "queryLines": [
+        "SELECT b.kebutuhan_utama, b.jumlah_laporan, b.jiwa_terdampak, p.nama_wilayah FROM workspace.kelompok2.gold_rekap_bantuan b JOIN workspace.kelompok2.gold_prioritas_area p USING (wilayah_id)"
+      ]
+    },
+    {
+      "name": "ds_quarantine",
+      "displayName": "Quarantine Silver",
+      "queryLines": [
+        "SELECT alasan, jenis_record, COUNT(*) AS jumlah FROM workspace.kelompok2.silver_quarantine GROUP BY alasan, jenis_record"
+      ]
+    }
+  ],
+  "pages": [
+    {
+      "name": "gold",
+      "displayName": "Prioritas Mitigasi",
+      "layout": [
+        {
+          "widget": {
+            "name": "judul",
+            "multilineTextboxSpec": {
+              "lines": [
+                "## Prioritas Mitigasi Gempa NTT — Lapisan Gold\n",
+                "Kelompok 2 · Praktikum Data Storage (Databricks Lakehouse). Sumber: tabel `workspace.kelompok2.gold_*`. Gempa dari USGS/BMKG (asli); **laporan lapangan, populasi, dan indeks risiko adalah data sintetis berlabel.**"
+              ]
+            }
+          },
+          "position": {
+            "x": 0,
+            "y": 0,
+            "width": 6,
+            "height": 2
+          }
+        },
+        {
+          "widget": {
+            "name": "kpi_jiwa",
+            "queries": [
+              {
+                "name": "main_query",
+                "query": {
+                  "datasetName": "ds_prio",
+                  "fields": [
+                    {
+                      "name": "sum(jiwa_terdampak)",
+                      "expression": "SUM(`jiwa_terdampak`)"
+                    }
+                  ],
+                  "disaggregated": false
+                }
+              }
+            ],
+            "spec": {
+              "version": 2,
+              "widgetType": "counter",
+              "encodings": {
+                "value": {
+                  "fieldName": "sum(jiwa_terdampak)",
+                  "displayName": "Jiwa terdampak"
+                }
+              },
+              "frame": {
+                "showTitle": true,
+                "title": "Jiwa terdampak",
+                "showDescription": true,
+                "description": "Total dari laporan lapangan aktif"
+              }
+            }
+          },
+          "position": {
+            "x": 0,
+            "y": 2,
+            "width": 2,
+            "height": 3
+          }
+        },
+        {
+          "widget": {
+            "name": "kpi_putus",
+            "queries": [
+              {
+                "name": "main_query",
+                "query": {
+                  "datasetName": "ds_prio",
+                  "fields": [
+                    {
+                      "name": "sum(jalan_putus)",
+                      "expression": "SUM(`jalan_putus`)"
+                    }
+                  ],
+                  "disaggregated": false
+                }
+              }
+            ],
+            "spec": {
+              "version": 2,
+              "widgetType": "counter",
+              "encodings": {
+                "value": {
+                  "fieldName": "sum(jalan_putus)",
+                  "displayName": "Laporan jalan putus"
+                }
+              },
+              "frame": {
+                "showTitle": true,
+                "title": "Laporan jalan putus",
+                "showDescription": true,
+                "description": "Akses yang terputus total"
+              }
+            }
+          },
+          "position": {
+            "x": 2,
+            "y": 2,
+            "width": 2,
+            "height": 3
+          }
+        },
+        {
+          "widget": {
+            "name": "kpi_gempa",
+            "queries": [
+              {
+                "name": "main_query",
+                "query": {
+                  "datasetName": "ds_prio",
+                  "fields": [
+                    {
+                      "name": "sum(jumlah_gempa)",
+                      "expression": "SUM(`jumlah_gempa`)"
+                    }
+                  ],
+                  "disaggregated": false
+                }
+              }
+            ],
+            "spec": {
+              "version": 2,
+              "widgetType": "counter",
+              "encodings": {
+                "value": {
+                  "fieldName": "sum(jumlah_gempa)",
+                  "displayName": "Gempa NTT (jendela 30 hari)"
+                }
+              },
+              "frame": {
+                "showTitle": true,
+                "title": "Gempa NTT (jendela 30 hari)",
+                "showDescription": true,
+                "description": "Dipetakan ke kabupaten/kota terdekat (≤ 1,5°)"
+              }
+            }
+          },
+          "position": {
+            "x": 4,
+            "y": 2,
+            "width": 2,
+            "height": 3
+          }
+        },
+        {
+          "widget": {
+            "name": "bar_skor",
+            "queries": [
+              {
+                "name": "main_query",
+                "query": {
+                  "datasetName": "ds_prio",
+                  "fields": [
+                    {
+                      "name": "nama_wilayah",
+                      "expression": "`nama_wilayah`"
+                    },
+                    {
+                      "name": "sum(skor_prioritas)",
+                      "expression": "SUM(`skor_prioritas`)"
+                    }
+                  ],
+                  "disaggregated": false
+                }
+              }
+            ],
+            "spec": {
+              "version": 3,
+              "widgetType": "bar",
+              "encodings": {
+                "x": {
+                  "fieldName": "sum(skor_prioritas)",
+                  "scale": {
+                    "type": "quantitative"
+                  },
+                  "displayName": "Skor prioritas"
+                },
+                "y": {
+                  "fieldName": "nama_wilayah",
+                  "scale": {
+                    "type": "categorical",
+                    "sort": {
+                      "by": "x-reverse"
+                    }
+                  },
+                  "displayName": "Kabupaten/kota"
+                },
+                "label": {
+                  "show": true
+                }
+              },
+              "frame": {
+                "showTitle": true,
+                "title": "Skor prioritas per kabupaten/kota",
+                "showDescription": true,
+                "description": "Makin tinggi, makin didahulukan"
+              }
+            }
+          },
+          "position": {
+            "x": 0,
+            "y": 5,
+            "width": 3,
+            "height": 9
+          }
+        },
+        {
+          "widget": {
+            "name": "bar_akses",
+            "queries": [
+              {
+                "name": "main_query",
+                "query": {
+                  "datasetName": "ds_akses",
+                  "fields": [
+                    {
+                      "name": "jenis_fasilitas",
+                      "expression": "`jenis_fasilitas`"
+                    },
+                    {
+                      "name": "sum(akses_putus)",
+                      "expression": "SUM(`akses_putus`)"
+                    },
+                    {
+                      "name": "sum(akses_terbatas)",
+                      "expression": "SUM(`akses_terbatas`)"
+                    },
+                    {
+                      "name": "sum(akses_lancar)",
+                      "expression": "SUM(`akses_lancar`)"
+                    }
+                  ],
+                  "disaggregated": false
+                }
+              }
+            ],
+            "spec": {
+              "version": 3,
+              "widgetType": "bar",
+              "encodings": {
+                "x": {
+                  "fieldName": "jenis_fasilitas",
+                  "scale": {
+                    "type": "categorical"
+                  },
+                  "displayName": "Jenis fasilitas"
+                },
+                "y": {
+                  "scale": {
+                    "type": "quantitative"
+                  },
+                  "fields": [
+                    {
+                      "fieldName": "sum(akses_putus)",
+                      "displayName": "Putus"
+                    },
+                    {
+                      "fieldName": "sum(akses_terbatas)",
+                      "displayName": "Terbatas"
+                    },
+                    {
+                      "fieldName": "sum(akses_lancar)",
+                      "displayName": "Lancar"
+                    }
+                  ]
+                }
+              },
+              "mark": {
+                "layout": "stack"
+              },
+              "frame": {
+                "showTitle": true,
+                "title": "Status akses jalan ke fasilitas"
+              }
+            }
+          },
+          "position": {
+            "x": 3,
+            "y": 5,
+            "width": 3,
+            "height": 9
+          }
+        },
+        {
+          "widget": {
+            "name": "pie_bantuan",
+            "queries": [
+              {
+                "name": "main_query",
+                "query": {
+                  "datasetName": "ds_bantuan",
+                  "fields": [
+                    {
+                      "name": "kebutuhan_utama",
+                      "expression": "`kebutuhan_utama`"
+                    },
+                    {
+                      "name": "sum(jumlah_laporan)",
+                      "expression": "SUM(`jumlah_laporan`)"
+                    }
+                  ],
+                  "disaggregated": false
+                }
+              }
+            ],
+            "spec": {
+              "version": 3,
+              "widgetType": "pie",
+              "encodings": {
+                "angle": {
+                  "fieldName": "sum(jumlah_laporan)",
+                  "scale": {
+                    "type": "quantitative"
+                  },
+                  "displayName": "Jumlah laporan"
+                },
+                "color": {
+                  "fieldName": "kebutuhan_utama",
+                  "scale": {
+                    "type": "categorical"
+                  },
+                  "displayName": "Kebutuhan utama"
+                },
+                "label": {
+                  "show": true
+                }
+              },
+              "frame": {
+                "showTitle": true,
+                "title": "Kebutuhan bantuan utama",
+                "showDescription": true,
+                "description": "Berdasarkan jumlah laporan lapangan"
+              }
+            }
+          },
+          "position": {
+            "x": 0,
+            "y": 14,
+            "width": 2,
+            "height": 7
+          }
+        },
+        {
+          "widget": {
+            "name": "tabel_prio",
+            "queries": [
+              {
+                "name": "main_query",
+                "query": {
+                  "datasetName": "ds_prio",
+                  "fields": [
+                    {
+                      "name": "nama_wilayah",
+                      "expression": "`nama_wilayah`"
+                    },
+                    {
+                      "name": "skor_prioritas",
+                      "expression": "`skor_prioritas`"
+                    },
+                    {
+                      "name": "jumlah_gempa",
+                      "expression": "`jumlah_gempa`"
+                    },
+                    {
+                      "name": "mag_maks",
+                      "expression": "`mag_maks`"
+                    },
+                    {
+                      "name": "jalan_putus",
+                      "expression": "`jalan_putus`"
+                    },
+                    {
+                      "name": "jalan_terbatas",
+                      "expression": "`jalan_terbatas`"
+                    },
+                    {
+                      "name": "jiwa_terdampak",
+                      "expression": "`jiwa_terdampak`"
+                    },
+                    {
+                      "name": "populasi",
+                      "expression": "`populasi`"
+                    },
+                    {
+                      "name": "indeks_risiko",
+                      "expression": "`indeks_risiko`"
+                    }
+                  ],
+                  "disaggregated": true
+                }
+              }
+            ],
+            "spec": {
+              "version": 1,
+              "widgetType": "table",
+              "encodings": {
+                "columns": [
+                  {
+                    "fieldName": "nama_wilayah",
+                    "booleanValues": [
+                      "false",
+                      "true"
+                    ],
+                    "imageUrlTemplate": "{{ @ }}",
+                    "imageTitleTemplate": "{{ @ }}",
+                    "imageWidth": "",
+                    "imageHeight": "",
+                    "linkUrlTemplate": "{{ @ }}",
+                    "linkTextTemplate": "{{ @ }}",
+                    "linkTitleTemplate": "{{ @ }}",
+                    "linkOpenInNewTab": true,
+                    "type": "string",
+                    "displayAs": "string",
+                    "visible": true,
+                    "order": 0,
+                    "title": "Wilayah",
+                    "allowSearch": true,
+                    "alignContent": "left",
+                    "allowHTML": false,
+                    "highlightLinks": false,
+                    "useMonospaceFont": false,
+                    "preserveWhitespace": false,
+                    "displayName": "Wilayah"
+                  },
+                  {
+                    "fieldName": "skor_prioritas",
+                    "booleanValues": [
+                      "false",
+                      "true"
+                    ],
+                    "imageUrlTemplate": "{{ @ }}",
+                    "imageTitleTemplate": "{{ @ }}",
+                    "imageWidth": "",
+                    "imageHeight": "",
+                    "linkUrlTemplate": "{{ @ }}",
+                    "linkTextTemplate": "{{ @ }}",
+                    "linkTitleTemplate": "{{ @ }}",
+                    "linkOpenInNewTab": true,
+                    "type": "number",
+                    "displayAs": "number",
+                    "visible": true,
+                    "order": 1,
+                    "title": "Skor",
+                    "allowSearch": false,
+                    "alignContent": "right",
+                    "allowHTML": false,
+                    "highlightLinks": false,
+                    "useMonospaceFont": false,
+                    "preserveWhitespace": false,
+                    "displayName": "Skor"
+                  },
+                  {
+                    "fieldName": "jumlah_gempa",
+                    "booleanValues": [
+                      "false",
+                      "true"
+                    ],
+                    "imageUrlTemplate": "{{ @ }}",
+                    "imageTitleTemplate": "{{ @ }}",
+                    "imageWidth": "",
+                    "imageHeight": "",
+                    "linkUrlTemplate": "{{ @ }}",
+                    "linkTextTemplate": "{{ @ }}",
+                    "linkTitleTemplate": "{{ @ }}",
+                    "linkOpenInNewTab": true,
+                    "type": "integer",
+                    "displayAs": "integer",
+                    "visible": true,
+                    "order": 2,
+                    "title": "Gempa",
+                    "allowSearch": false,
+                    "alignContent": "right",
+                    "allowHTML": false,
+                    "highlightLinks": false,
+                    "useMonospaceFont": false,
+                    "preserveWhitespace": false,
+                    "displayName": "Gempa"
+                  },
+                  {
+                    "fieldName": "mag_maks",
+                    "booleanValues": [
+                      "false",
+                      "true"
+                    ],
+                    "imageUrlTemplate": "{{ @ }}",
+                    "imageTitleTemplate": "{{ @ }}",
+                    "imageWidth": "",
+                    "imageHeight": "",
+                    "linkUrlTemplate": "{{ @ }}",
+                    "linkTextTemplate": "{{ @ }}",
+                    "linkTitleTemplate": "{{ @ }}",
+                    "linkOpenInNewTab": true,
+                    "type": "number",
+                    "displayAs": "number",
+                    "visible": true,
+                    "order": 3,
+                    "title": "Mag. maks",
+                    "allowSearch": false,
+                    "alignContent": "right",
+                    "allowHTML": false,
+                    "highlightLinks": false,
+                    "useMonospaceFont": false,
+                    "preserveWhitespace": false,
+                    "displayName": "Mag. maks"
+                  },
+                  {
+                    "fieldName": "jalan_putus",
+                    "booleanValues": [
+                      "false",
+                      "true"
+                    ],
+                    "imageUrlTemplate": "{{ @ }}",
+                    "imageTitleTemplate": "{{ @ }}",
+                    "imageWidth": "",
+                    "imageHeight": "",
+                    "linkUrlTemplate": "{{ @ }}",
+                    "linkTextTemplate": "{{ @ }}",
+                    "linkTitleTemplate": "{{ @ }}",
+                    "linkOpenInNewTab": true,
+                    "type": "integer",
+                    "displayAs": "integer",
+                    "visible": true,
+                    "order": 4,
+                    "title": "Jalan putus",
+                    "allowSearch": false,
+                    "alignContent": "right",
+                    "allowHTML": false,
+                    "highlightLinks": false,
+                    "useMonospaceFont": false,
+                    "preserveWhitespace": false,
+                    "displayName": "Jalan putus"
+                  },
+                  {
+                    "fieldName": "jalan_terbatas",
+                    "booleanValues": [
+                      "false",
+                      "true"
+                    ],
+                    "imageUrlTemplate": "{{ @ }}",
+                    "imageTitleTemplate": "{{ @ }}",
+                    "imageWidth": "",
+                    "imageHeight": "",
+                    "linkUrlTemplate": "{{ @ }}",
+                    "linkTextTemplate": "{{ @ }}",
+                    "linkTitleTemplate": "{{ @ }}",
+                    "linkOpenInNewTab": true,
+                    "type": "integer",
+                    "displayAs": "integer",
+                    "visible": true,
+                    "order": 5,
+                    "title": "Jalan terbatas",
+                    "allowSearch": false,
+                    "alignContent": "right",
+                    "allowHTML": false,
+                    "highlightLinks": false,
+                    "useMonospaceFont": false,
+                    "preserveWhitespace": false,
+                    "displayName": "Jalan terbatas"
+                  },
+                  {
+                    "fieldName": "jiwa_terdampak",
+                    "booleanValues": [
+                      "false",
+                      "true"
+                    ],
+                    "imageUrlTemplate": "{{ @ }}",
+                    "imageTitleTemplate": "{{ @ }}",
+                    "imageWidth": "",
+                    "imageHeight": "",
+                    "linkUrlTemplate": "{{ @ }}",
+                    "linkTextTemplate": "{{ @ }}",
+                    "linkTitleTemplate": "{{ @ }}",
+                    "linkOpenInNewTab": true,
+                    "type": "integer",
+                    "displayAs": "integer",
+                    "visible": true,
+                    "order": 6,
+                    "title": "Jiwa terdampak",
+                    "allowSearch": false,
+                    "alignContent": "right",
+                    "allowHTML": false,
+                    "highlightLinks": false,
+                    "useMonospaceFont": false,
+                    "preserveWhitespace": false,
+                    "displayName": "Jiwa terdampak"
+                  },
+                  {
+                    "fieldName": "populasi",
+                    "booleanValues": [
+                      "false",
+                      "true"
+                    ],
+                    "imageUrlTemplate": "{{ @ }}",
+                    "imageTitleTemplate": "{{ @ }}",
+                    "imageWidth": "",
+                    "imageHeight": "",
+                    "linkUrlTemplate": "{{ @ }}",
+                    "linkTextTemplate": "{{ @ }}",
+                    "linkTitleTemplate": "{{ @ }}",
+                    "linkOpenInNewTab": true,
+                    "type": "integer",
+                    "displayAs": "integer",
+                    "visible": true,
+                    "order": 7,
+                    "title": "Populasi",
+                    "allowSearch": false,
+                    "alignContent": "right",
+                    "allowHTML": false,
+                    "highlightLinks": false,
+                    "useMonospaceFont": false,
+                    "preserveWhitespace": false,
+                    "displayName": "Populasi"
+                  },
+                  {
+                    "fieldName": "indeks_risiko",
+                    "booleanValues": [
+                      "false",
+                      "true"
+                    ],
+                    "imageUrlTemplate": "{{ @ }}",
+                    "imageTitleTemplate": "{{ @ }}",
+                    "imageWidth": "",
+                    "imageHeight": "",
+                    "linkUrlTemplate": "{{ @ }}",
+                    "linkTextTemplate": "{{ @ }}",
+                    "linkTitleTemplate": "{{ @ }}",
+                    "linkOpenInNewTab": true,
+                    "type": "number",
+                    "displayAs": "number",
+                    "visible": true,
+                    "order": 8,
+                    "title": "Indeks risiko",
+                    "allowSearch": false,
+                    "alignContent": "right",
+                    "allowHTML": false,
+                    "highlightLinks": false,
+                    "useMonospaceFont": false,
+                    "preserveWhitespace": false,
+                    "displayName": "Indeks risiko"
+                  }
+                ]
+              },
+              "invisibleColumns": [],
+              "allowHTMLByDefault": false,
+              "itemsPerPage": 25,
+              "paginationSize": "default",
+              "condensed": true,
+              "withRowNumber": true,
+              "frame": {
+                "showTitle": true,
+                "title": "Detail prioritas area (urut skor)"
+              }
+            }
+          },
+          "position": {
+            "x": 2,
+            "y": 14,
+            "width": 4,
+            "height": 7
+          }
+        },
+        {
+          "widget": {
+            "name": "bar_quarantine",
+            "queries": [
+              {
+                "name": "main_query",
+                "query": {
+                  "datasetName": "ds_quarantine",
+                  "fields": [
+                    {
+                      "name": "alasan",
+                      "expression": "`alasan`"
+                    },
+                    {
+                      "name": "sum(jumlah)",
+                      "expression": "SUM(`jumlah`)"
+                    }
+                  ],
+                  "disaggregated": false
+                }
+              }
+            ],
+            "spec": {
+              "version": 3,
+              "widgetType": "bar",
+              "encodings": {
+                "x": {
+                  "fieldName": "sum(jumlah)",
+                  "scale": {
+                    "type": "quantitative"
+                  },
+                  "displayName": "Record"
+                },
+                "y": {
+                  "fieldName": "alasan",
+                  "scale": {
+                    "type": "categorical",
+                    "sort": {
+                      "by": "x-reverse"
+                    }
+                  },
+                  "displayName": "Alasan"
+                },
+                "label": {
+                  "show": true
+                }
+              },
+              "frame": {
+                "showTitle": true,
+                "title": "Kualitas data: alasan quarantine",
+                "showDescription": true,
+                "description": "Record yang ditolak di Silver, tidak dibuang diam-diam"
+              }
+            }
+          },
+          "position": {
+            "x": 0,
+            "y": 21,
+            "width": 6,
+            "height": 5
+          }
+        }
+      ],
+      "pageType": "PAGE_TYPE_CANVAS"
+    }
+  ]
+}

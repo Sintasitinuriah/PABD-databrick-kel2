@@ -65,6 +65,18 @@ Simpan ke folder `bukti\` dengan nama berikut:
 
 Cara cepat: `Windows + Shift + S`, lalu tempel ke Paint dan simpan dengan nama di atas.
 
+## Langkah 6b — Dashboard AI/BI (opsional, 3 menit)
+
+Definisi dashboard tersimpan di `cloud/dashboard_gold.lvdash.json`: 4 dataset, 9 widget (angka utama, skor prioritas,
+status akses fasilitas, kebutuhan bantuan, tabel detail, alasan quarantine). Dashboard membaca tabel
+`workspace.kelompok2.gold_*` dan `silver_quarantine`, jadi notebook di Langkah 5 harus sudah berhasil.
+
+1. **Workspace** → folder Anda → ⋮ → **Import** → **File**, pilih `dashboard_gold.lvdash.json`.
+2. Buka dashboard hasil impor. Kalau diminta warehouse, pilih **Serverless Starter Warehouse**.
+3. Screenshot seluruh halaman, simpan sebagai `bukti\M5_ui_dashboard.png`.
+
+Kalau schema Anda bukan `kelompok2`, ganti teks `workspace.kelompok2` di berkas JSON sebelum impor.
+
 ## Langkah 7 — Kabari saya
 
 Cukup tulis "screenshot sudah ada di bukti/". Saya lanjut menyusun slide 16 dan membandingkan angka cloud vs lokal untuk slide 15.
