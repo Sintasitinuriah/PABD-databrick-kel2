@@ -218,17 +218,21 @@ Manggarai 162,58."
 
 Transisi: "Raoul menutup dengan platform aslinya dan penilaian jujur."
 
-## Slide 16 — Free Edition (40 dtk, Raoul)
+## Slide 16 — Free Edition (50 dtk, Raoul)
 
-"Praktikum kami berjalan di replika lokal: Spark dan Delta open-source di Docker, engine dan
-format tabel yang sama dengan Databricks. Status jujur per malam 11 November: akun Databricks
-Free Edition belum kami buat, jadi screenshot UI asli belum ada; slide ini memakai topologi
-replika kami.
+"Pipeline yang sama kami jalankan di Databricks Free Edition, di compute Serverless. Hasilnya
+sama dengan replika lokal: lima prioritas teratas identik, Manggarai tetap 162,58; 136 laporan
+aktif dan 8 revisi lewat MERGE juga identik. Satu-satunya selisih ada di gempa tervalidasi,
+55.207 lawan 55.219, karena versi cloud hanya membaca satu endpoint BMKG.
 
-Batas Free Edition menurut dokumentasi resmi: serverless saja, satu SQL warehouse 2X-Small,
-maksimal lima job bersamaan, non-commercial only, dan berkas fisik dikelola platform sehingga
-folder `_delta_log` tidak bisa dibuka langsung oleh pengguna. Notebook untuk versi cloud sudah
-kami siapkan bila akun siap sebelum presentasi."
+Kami juga menjalankannya seperti operasional sungguhan: pipeline menjadi job terjadwal setiap
+pukul 06.00 WIB, sekitar 104 detik per run, dan tabel Gold tampil di dashboard AI/BI. Di kanan,
+time travel laporan RPT-0068: sebelum MERGE jalan putus dengan 1.076 jiwa, sesudahnya terbatas
+dengan 1.721 jiwa.
+
+Temuan jujur: notebook cloud awalnya gagal karena countDistinct di dalam window ditolak Spark.
+Setelah diselaraskan dengan kode lokal, Run all sukses. Engine cloud adalah Databricks Runtime
+19.15 dengan Photon, bukan Spark 4.2.0 seperti di laptop, tetapi format Delta-nya sama."
 
 Transisi: "Penilaian kami terhadap platform ini."
 
@@ -240,8 +244,10 @@ kolaborasi notebook real-time.
 
 Keterbatasan, termasuk yang kami alami sendiri: biaya lisensi untuk pemakaian nyata di luar
 Free Edition; ketergantungan koneksi internet — justru masalah di NTT saat bencana; vendor
-lock-in pada control plane; dan retensi VACUUM yang membatasi klaim bukti abadi, seperti kami
-buktikan di E5. Kami menyebut ini terbuka karena BPBD/BNPB harus menimbangnya sebelum adopsi."
+lock-in pada control plane; retensi VACUUM yang membatasi klaim bukti abadi, seperti kami
+buktikan di E5; dan kuota Free Edition yang tidak diumumkan angkanya: bila habis, compute mati
+sampai besok, tanpa SLA, dan hanya untuk non-komersial. Kami menyebut ini terbuka karena
+BPBD/BNPB harus menimbangnya sebelum adopsi."
 
 Transisi: "Penutup."
 
@@ -251,10 +257,10 @@ Transisi: "Penutup."
 Lake memberi ACID dan time travel di atas object storage murah lewat mekanisme yang sederhana:
 buku transaksi JSON yang mencatat file mana yang berlaku pada setiap versi. Dan pipeline
 medallion mengubah laporan lapangan yang berantakan menjadi prioritas bantuan yang bisa
-diaudit: 166 laporan masuk, 23 dikarantina dengan alasan, 8 revisi terlambat diterapkan tanpa
-menghapus bukti lama.
+diaudit: 23 laporan dikarantina dengan alasan, 8 revisi terlambat diterapkan tanpa menghapus
+bukti lama, dan hasilnya identik di laptop maupun di Databricks Free Edition.
 
-Terima kasih. Semua kode, data, dan bukti praktikum tersedia di folder kelompok dan siap
+Terima kasih. Semua kode, data, dan bukti praktikum ada di repositori GitHub kelompok dan siap
 diperiksa. Kami buka pertanyaan."
 
 ---
@@ -268,9 +274,13 @@ diperiksa. Kami buka pertanyaan."
 - **"Apakah angka prioritas bisa dipakai nyata?"** Belum. Populasi dan jiwa terdampak
   sintetis berlabel; bobot skor pilihan kelompok. Yang nyata adalah katalog gempa dan
   mekanisme pipeline-nya.
-- **"Apa bedanya replika lokal dengan Databricks asli?"** Engine dan format tabel sama
-  (Spark 4.2.0, Delta 4.4.0). Yang berbeda: control plane, Unity Catalog, serverless, dan
-  fakta bahwa di Free Edition berkas fisik tidak bisa dibuka pengguna.
+- **"Apa bedanya replika lokal dengan Databricks asli?"** Format tabel dan kode pipeline sama;
+  engine berbeda (lokal Spark 4.2.0 + Delta 4.4.0, cloud Databricks Runtime 19.15 Photon).
+  Yang berbeda lagi: control plane, Unity Catalog, serverless, dan fakta bahwa di Free Edition
+  berkas fisik tidak bisa dibuka pengguna. Hasil Gold keduanya identik (bukti/M5_*).
+- **"Apakah datanya realtime?"** Belum. Pipeline batch: data diunduh sekali, job harian
+  memproses ulang berkas di Volume. Jalur ke near-realtime: Auto Loader + job terjadwal;
+  Serverless Free Edition hanya mendukung trigger availableNow, bukan streaming kontinu.
 - **"Kenapa quarantine bukan dibuang?"** Audit bantuan bencana menuntut setiap penolakan
   bisa dijelaskan dan direview manusia; konflik revisi adalah keputusan petugas, bukan mesin.
 - **"VACUUM menghapus bukti, bukankah itu berbahaya?"** Ya, bila retensi salah setel. Karena
