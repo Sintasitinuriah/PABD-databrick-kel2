@@ -1,0 +1,86 @@
+# Output notebook Databricks Free Edition (Serverless) - workspace Sinta
+# Run 826178813762667 (task 1043803072200056), 2026-11-18, status TERMINATED/SUCCESS
+# Diekstrak dari 'databricks jobs export-run'
+
+=== sel 3.0
+Berkas di Volume:
+  [ADA] usgs_indonesia.csv
+  [ADA] laporan_edge.csv
+  [ADA] ref_wilayah_ntt.csv
+  [ADA] bmkg_gempaterkini.json
+
+=== sel 5.0
+bronze_gempa_usgs: 55194 baris
+bronze_ref_wilayah: 22 baris
+bronze_laporan_edge: 166 baris
+
+=== sel 7.0
+silver_gempa_tervalidasi: 55207 baris
+
+=== sel 8.0
+batch-1 (revisi 1): 135 baris
+setelah MERGE revisi terlambat: 136 baris; 8 baris kini revisi > 1
+
+Alasan quarantine:
++--------------------------+-----+
+|alasan                    |count|
++--------------------------+-----+
+|konflik_revisi_isi_berbeda|10   |
+|koordinat_di_luar_NTT     |6    |
+|identitas_pelapor_kosong  |4    |
+|duplikat_persis           |3    |
+|koordinat_di_luar_cakupan |2    |
++--------------------------+-----+
+
+
+=== sel 10.0
+jendela operasional: 30 hari s.d. 2026-11-09 21:06:35.674000 | 22 gempa NTT
+gold_prioritas_area: 22 baris
+
+ kolom: ['nama_wilayah', 'jumlah_gempa', 'mag_maks', 'jalan_putus', 'jiwa_terdampak', 'skor_prioritas']
+   ['Manggarai', 1, 5.2, 3, 18122, 162.58]
+   ['Ende', 1, 5.0, 2, 12854, 162.42]
+   ['Lembata', 3, 4.5, 2, 11786, 159.32]
+   ['Kota Kupang', 2, 4.8, 1, 13171, 152.29]
+   ['Manggarai Barat', 5, 4.9, 2, 11013, 152.21]
+   ['Alor', 1, 4.6, 3, 14098, 146.84]
+   ['Manggarai Timur', 1, 4.3, 3, 14703, 146.16]
+   ['Sumba Barat Daya', 5, 4.6, 0, 14000, 137.53]
+   ['Flores Timur', 1, 4.2, 0, 7811, 134.94]
+   ['Nagekeo', 1, 4.4, 0, 9799, 128.21]
+=== sel 12.0
+ kolom: ['version', 'timestamp', 'userId', 'userName', 'operation', 'operationParameters', 'job', 'notebook', 'queryHistoryStatementId', 'clusterId', 'readVersion', 'isolationLevel', 'isBlindAppend', 'operationMetrics', 'userMetadata', 'engineInfo']
+   [1, '2026-11-18T15:52:42.841Z', '71144563568881', 'sintasitinuriah@mail.ugm.ac.id', 'MERGE', {'predicate': '["(report_id#16883 = report_id#14963)"]', 'clusterBy': '[]', 'matchedPredicates': '[{"predicate":"(revision#16884 < revision#14982)","actionType":"update"}]', 'statsOnLoad': 'true', 'notMatchedBySourcePredicates': '[]', 'notMatchedPredicates': '[{"actionType":"insert"}]', 'clusteringOnWriteStatus': None}, ['48715630511994', 'Medallion Gempa NTT - Kelompok 2 (uji perbaikan)', '826178813762667', '1043803072200056', '71144563568881', 'manual', '7474653003737305'], ['49198415808444'], '0cf31efd-2e9b-49ac-88a6-e9d45d98523b', '1118-155121-oz46g6t8-v2n', 0, 'WriteSerializable', False, {'numTargetRowsCopied': '0', 'numTargetRowsDeleted': '0', 'numTargetFilesAdded': '1', 'numTargetBytesAdded': '6426', 'numTargetBytesRemoved': '0', 'numTargetDeletionVectorsAdded': '1', 'numTargetRowsMatchedUpdated': '7', 'executionTimeMs': '5575', 'materializeSourceTimeMs': '1174', 'numTargetRowsInserted': '1', 'numTargetRowsMatchedDeleted': '0', 'numTargetDeletionVectorsUpdated': '0', 'scanTimeMs': '1841', 'numTargetRowsUpdated': '7', 'numOutputRows': '8', 'numTargetDeletionVectorsRemoved': '0', 'numTargetRowsNotMatchedBySourceUpdated': '0', 'numTargetChangeFilesAdded': '0', 'numSourceRows': '8', 'numTargetFilesRemoved': '0', 'numTargetRowsNotMatchedBySourceDeleted': '0', 'rewriteTimeMs': '2411'}, None, 'Databricks-Runtime/19.15.x-aarch64-photon-scala2.13']
+   [0, '2026-11-18T15:52:32.251Z', '71144563568881', 'sintasitinuriah@mail.ugm.ac.id', 'CREATE OR REPLACE TABLE AS SELECT', {'isV1SaveAsTableOverwrite': 'true', 'partitionBy': '[]', 'clusterBy': '[]', 'description': None, 'isManaged': 'true', 'properties': '{"delta.parquet.compression.codec":"zstd","delta.parquet.format.version.afe.internal":"2.12.0","delta.enableDeletionVectors":"true","delta.parquet.format.version":"2.12.0","delta.enableRowTracking":"true","delta.checkpointPolicy":"v2","io.unitycatalog.tableId":"9f2ada0e-62af-40ca-84b5-b3fd664031da","delta.rowTracking.materializedRowCommitVersionColumnName":"_row-commit-version-col-69d95093-14dd-43d6-b324-ac7bff42db56","delta.enableInCommitTimestamps":"true","databricks.internal.autoUpgrades.delta.enableInCommitTimestamps":"true","delta.rowTracking.materializedRowIdColumnName":"_row-id-col-9a45b764-c7ec-452e-a221-23a57b6bee48"}', 'statsOnLoad': 'true', 'clusterByAuto': 'true', 'clusteringOnWriteStatus': 'Reason for skipping: Nonexistent clustering column, generally when replacing a Liquid table with a table without clustering columns'}, ['48715630511994', 'Medallion Gempa NTT - Kelompok 2 (uji perbaikan)', '826178813762667', '1043803072200056', '71144563568881', 'manual', '7474653003737305'], ['49198415808444'], '15dc37cf-e759-4596-aa7c-0e48b312557a', '1118-155121-oz46g6t8-v2n', None, 'WriteSerializable', False, {'numFiles': '1', 'numRemovedFiles': '0', 'numRemovedBytes': '0', 'numDeletionVectorsRemoved': '0', 'numOutputRows': '135', 'numOutputBytes': '13841'}, None, 'Databricks-Runtime/19.15.x-aarch64-photon-scala2.13']
+=== sel 13.0
+Laporan yang direvisi: RPT-0068
+
+--- VERSI 0 (sebelum laporan susulan masuk) ---
++---------+--------+------------+--------------+-------------------+-------------------+
+|report_id|revision|status_jalan|jiwa_terdampak|event_time         |received_at        |
++---------+--------+------------+--------------+-------------------+-------------------+
+|RPT-0068 |1       |putus       |1076          |2026-11-11 04:15:00|2026-11-11 04:36:00|
++---------+--------+------------+--------------+-------------------+-------------------+
+
+--- VERSI KINI (setelah rekonsiliasi) ---
++---------+--------+------------+--------------+-------------------+-------------------+
+|report_id|revision|status_jalan|jiwa_terdampak|event_time         |received_at        |
++---------+--------+------------+--------------+-------------------+-------------------+
+|RPT-0068 |2       |terbatas    |1721          |2026-11-11 04:15:00|2026-11-11 10:47:00|
++---------+--------+------------+--------------+-------------------+-------------------+
+
+
+=== sel 15.0
+RINGKASAN JUMLAH BARIS (cloud):
+  bronze_gempa_usgs                55194
+  bronze_laporan_edge              166
+  silver_gempa_tervalidasi         55207
+  silver_laporan_edge_aktif        136
+  silver_quarantine                25
+  gold_prioritas_area              22
+  gold_status_akses_fasilitas      77
+  gold_rekap_bantuan               72
+
+Jendela waktu operasional: 30 hari | gempa NTT dalam jendela: 22
+Skor tertinggi: 162.58
+

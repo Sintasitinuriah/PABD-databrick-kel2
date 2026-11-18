@@ -133,6 +133,7 @@ e = (spark.table(tabel("bronze_laporan_edge"))
 nlat_min, nlat_max, nlon_min, nlon_max = BBOX_NTT
 e = e.withColumn("_alasan",
     F.when(F.trim(F.coalesce(F.col("reporter_id"), F.lit(""))) == "", F.lit("identitas_pelapor_kosong"))
+    .when(F.col("lat").isNull() | F.col("lon").isNull(), F.lit("koordinat_kosong"))
     .when((F.col("lat") < nlat_min) | (F.col("lat") > nlat_max) | (F.col("lon") < nlon_min) | (F.col("lon") > nlon_max),
           F.lit("koordinat_di_luar_NTT"))
     .when(F.col("jiwa_terdampak").isNull() | (F.col("jiwa_terdampak") < 0), F.lit("jiwa_terdampak_tidak_valid"))
@@ -154,9 +155,11 @@ q_dup = bersih.filter(F.col("_rn") > 1).select(
     F.current_timestamp().alias("_quarantined_at"), F.lit(BATCH_ID).alias("_batch_id"))
 bersih = bersih.filter(F.col("_rn") == 1).drop("_rn")
 
-wg = Window.partitionBy("report_id", "revision")
-konflik_keys = bersih.withColumn("_nv", F.countDistinct("_checksum").over(wg)) \
-                     .filter(F.col("_nv") > 1).select("report_id", "revision").distinct()
+# Spark menolak countDistinct di dalam window (DISTINCT_WINDOW_FUNCTION_UNSUPPORTED),
+# jadi dihitung lewat agregasi lalu di-join, sama seperti replika lokal.
+konflik_keys = (bersih.groupBy("report_id", "revision")
+                .agg(F.countDistinct("_checksum").alias("_nv"))
+                .filter(F.col("_nv") > 1).select("report_id", "revision"))
 q_konflik = bersih.join(konflik_keys, ["report_id", "revision"], "inner").select(
     F.lit("laporan_edge").alias("jenis_record"), F.col("report_id").alias("record_id"),
     F.col("_source").alias("sumber"), F.lit("konflik_revisi_isi_berbeda").alias("alasan"),
@@ -171,6 +174,9 @@ batch1 = bersih.filter(F.col("revision") == 1)
 batch2 = bersih.filter(F.col("revision") > 1)
 batch1.write.format("delta").mode("overwrite").saveAsTable(tabel("silver_laporan_edge_aktif"))
 print("batch-1 (revisi 1):", spark.table(tabel("silver_laporan_edge_aktif")).count(), "baris")
+# Catat versi sebelum MERGE. Kalau notebook dijalankan ulang, versi ini bukan lagi 0,
+# jadi time travel di bawah memakai angka ini, bukan 0 yang di-hardcode.
+VERSI_SEBELUM_MERGE = spark.sql(f"DESCRIBE HISTORY {tabel('silver_laporan_edge_aktif')} LIMIT 1").first()["version"]
 
 dt = DeltaTable.forName(spark, tabel("silver_laporan_edge_aktif"))
 (dt.alias("s").merge(batch2.alias("t"), "s.report_id = t.report_id")
@@ -259,11 +265,15 @@ display(spark.table(tabel("gold_prioritas_area")).select(
 
 # COMMAND ----------
 
-rid = spark.table(tabel("silver_laporan_edge_aktif")).filter(F.col("revision") > 1).select("report_id").first()["report_id"]
+baris_rev = spark.table(tabel("silver_laporan_edge_aktif")).filter(F.col("revision") > 1).select("report_id").first()
+if baris_rev is None:
+    raise ValueError("Tidak ada laporan dengan revision > 1 setelah MERGE; cek isi laporan_edge.csv di Volume.")
+rid = baris_rev["report_id"]
 print("Laporan yang direvisi:", rid)
-print("\n--- VERSI 0 (sebelum laporan susulan masuk) ---")
+print(f"\n--- VERSI {VERSI_SEBELUM_MERGE} (sebelum laporan susulan masuk) ---")
 spark.sql(f"SELECT report_id, revision, status_jalan, jiwa_terdampak, event_time, received_at "
-          f"FROM {tabel('silver_laporan_edge_aktif')} VERSION AS OF 0 WHERE report_id = '{rid}'").show(truncate=False)
+          f"FROM {tabel('silver_laporan_edge_aktif')} VERSION AS OF {VERSI_SEBELUM_MERGE} "
+          f"WHERE report_id = '{rid}'").show(truncate=False)
 print("--- VERSI KINI (setelah rekonsiliasi) ---")
 spark.sql(f"SELECT report_id, revision, status_jalan, jiwa_terdampak, event_time, received_at "
           f"FROM {tabel('silver_laporan_edge_aktif')} WHERE report_id = '{rid}'").show(truncate=False)
